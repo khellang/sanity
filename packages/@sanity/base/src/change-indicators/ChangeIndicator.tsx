@@ -6,6 +6,7 @@ import {Path} from '@sanity/types'
 import {useReporter} from './tracker'
 import {ChangeIndicatorContext} from './ChangeIndicatorContext'
 import {ChangeBar} from './ChangeBar'
+import {EMPTY_ARRAY} from './constants'
 
 const isPrimitive = (value: unknown): boolean =>
   typeof value === 'string' ||
@@ -91,18 +92,22 @@ export function ChangeIndicatorProvider(props: {
   children: React.ReactNode
 }) {
   const parentContext = React.useContext(ChangeIndicatorContext)
-  const fullPath = parentContext.fullPath.concat(props.path)
+  const fullPath = React.useMemo(() => parentContext.fullPath.concat(props.path), [
+    parentContext.fullPath,
+    props.path,
+  ])
 
+  const contextValue = React.useMemo(() => {
+    return {
+      value: props.value,
+      compareValue: props.compareValue,
+      focusPath: props.focusPath || EMPTY_ARRAY,
+      path: props.path,
+      fullPath: fullPath,
+    }
+  }, [fullPath, props.value, props.compareValue, props.focusPath, props.path])
   return (
-    <ChangeIndicatorContext.Provider
-      value={{
-        value: props.value,
-        compareValue: props.compareValue,
-        focusPath: props.focusPath || [],
-        path: props.path,
-        fullPath: fullPath,
-      }}
-    >
+    <ChangeIndicatorContext.Provider value={contextValue}>
       {props.children}
     </ChangeIndicatorContext.Provider>
   )
@@ -161,7 +166,10 @@ export const ChangeIndicatorWithProvidedFullPath = ({
 }: any) => {
   const parentContext = React.useContext(ChangeIndicatorContext)
 
-  const fullPath = parentContext.fullPath.concat(path)
+  const fullPath = React.useMemo(() => parentContext.fullPath.concat(path), [
+    parentContext.fullPath,
+    path,
+  ])
   return (
     <CoreChangeIndicator
       hidden={hidden}
@@ -191,16 +199,24 @@ export const ChangeIndicatorCompareValueProvider = (props: {
 }) => {
   const parentContext = React.useContext(ChangeIndicatorContext)
 
+  const contextValue = React.useMemo(
+    () => ({
+      value: props.value,
+      compareValue: props.compareValue,
+      focusPath: parentContext.focusPath || EMPTY_ARRAY,
+      path: parentContext.path,
+      fullPath: parentContext.fullPath,
+    }),
+    [
+      parentContext.focusPath,
+      parentContext.path,
+      parentContext.fullPath,
+      props.value,
+      props.compareValue,
+    ]
+  )
   return (
-    <ChangeIndicatorContext.Provider
-      value={{
-        value: props.value,
-        compareValue: props.compareValue,
-        focusPath: parentContext.focusPath || [],
-        path: parentContext.path,
-        fullPath: parentContext.fullPath,
-      }}
-    >
+    <ChangeIndicatorContext.Provider value={contextValue}>
       {props.children}
     </ChangeIndicatorContext.Provider>
   )

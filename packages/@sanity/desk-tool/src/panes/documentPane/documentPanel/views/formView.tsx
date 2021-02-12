@@ -38,10 +38,10 @@ const noop = () => undefined
 const INITIAL_STATE = {
   filterField: () => true,
 }
-
+const EMPTY_ARRAY = []
 export class FormView extends React.PureComponent<Props> {
   static defaultProps = {
-    markers: [],
+    markers: EMPTY_ARRAY,
     isConnected: true,
   }
 
