@@ -63,7 +63,7 @@ export class FormBuilderInput extends React.Component<Props> {
   }
   _input: FormBuilderInput | HTMLDivElement | null
   getValuePath = () => {
-    return this.context.getValuePath().concat(this.props.path)
+    return PathUtils.pathFor(this.context.getValuePath().concat(this.props.path))
   }
 
   getChildContext() {
@@ -216,7 +216,7 @@ export class FormBuilderInput extends React.Component<Props> {
         .filter((marker) => PathUtils.startsWith(path, marker.path))
         .map((marker) => ({
           ...marker,
-          path: PathUtils.trimChildPath(path, marker.path),
+          path: PathUtils.pathFor(PathUtils.trimChildPath(path, marker.path)),
         }))
     }
     const childFocusPath = this.getChildFocusPath()
@@ -239,8 +239,8 @@ export class FormBuilderInput extends React.Component<Props> {
       <div data-focus-path={PathUtils.toString(path)}>
         <FormFieldPresenceContext.Provider value={childPresenceInfo}>
           <ChangeIndicatorProvider
-            path={path}
-            focusPath={focusPath}
+            path={PathUtils.pathFor(path)}
+            focusPath={PathUtils.pathFor(focusPath)}
             value={value}
             compareValue={childCompareValue}
           >
